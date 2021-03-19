@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Moheim Cartographic Information Society</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style type="text/css">
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            html, body, #map{
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <!-- Mapbox GL -->        
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+
+        <!-- Mapbox GL Draw -->
+        <!-- <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.css' type='text/css' />
+        <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.js'></script> -->
+
+        <script>
+            var map = new mapboxgl.Map({
+                "container": "map",
+                "zoom": 10,
+                "center": [0.0, 0.0],
+                "style": {
+                    "version": 8,
+                    // todo: figure out how to do our own glyphs and sprites
+                    "glyphs": "https://go-spatial.github.io/carto-assets/fonts/{fontstack}/{range}.pbf",
+                    "sprite": "https://go-spatial.github.io/carto-assets/spritesets/maki",
+                    "sources": {
+                        "mcis-layers": {
+                            "type": "vector",
+                            "tiles": [
+                                "http://localhost:8000/maps/all_layers/{z}/{x}/{y}",
+                            ],
+                            "minzoom": 6,
+                            "maxzoom": 22
+                        }
+                    },
+                    "layers": [
+                        {
+                            "id": "ocean",
+                            "type": "background",
+                            "paint": {
+                                "background-color": "#C1DFF0",
+                            },
+                        },
+                        {
+                            "id": "land",
+                            "type": "fill",
+                            "source": "mcis-layers",
+                            "source-layer": "land",
+                            "paint": {
+                                "fill-color": "#aaa",
+                            },
+                        },
+                        {
+                            "id": "biomes-fill",
+                            "type": "fill",
+                            "source": "mcis-layers",
+                            "source-layer": "biomes",
+                            "paint": {
+                                "fill-color": [
+                                    "match",
+                                    ["get", "biome"],
+                                    "Meadows",
+                                    "#9ad492",
+                                    "Black Forest",
+                                    "#497043",
+                                    "Swamp",
+                                    "#594e3d",
+                                    "Mountain",
+                                    "#ddeaf0",
+                                    "Plains",
+                                    "#d6ceae",
+                                    "Ashlands",
+                                    "#a36b6a",
+                                    "Mistlands",
+                                    "#95c4b5",
+                                    "#000",
+                                ],
+                                "fill-opacity": 1,
+                            },
+                        },
+                        {
+                            "id": "political-boundaries",
+                            "type": "line",
+                            "source": "mcis-layers",
+                            "source-layer": "political_boundaries",
+                            "paint": {
+                                "line-color": "#000",
+                                "line-opacity": 0.5,
+                                "line-width": 2,
+                            },
+                        },
+                        {
+                            "id": "buildings",
+                            "type": "fill",
+                            "source": "mcis-layers",
+                            "source-layer": "buildings",
+                            "paint": {
+                                "fill-color": "#000",
+                            },
+                        },
+                        {
+                            "id": "water-paths-line",
+                            "type": "line",
+                            "source": "mcis-layers",
+                            "source-layer": "water_paths",
+                            "paint": {
+                                "line-color": "#6d91a6",
+                                "line-dasharray": [2, 4],
+                            },
+                        },
+                        {
+                            "id": "roads-outline",
+                            "type": "line",
+                            "source": "mcis-layers",
+                            "source-layer": "roads",
+                            "paint": {
+                                "line-color": "#000",
+                                "line-width": 3,
+                            },
+                        },
+                        {
+                            "id": "roads-inline",
+                            "type": "line",
+                            "source": "mcis-layers",
+                            "source-layer": "roads",
+                            "paint": {
+                                "line-color": "#fff",
+                                "line-width": 2,
+                            },
+                        },
+                        {
+                            "id": "fog",
+                            "type": "fill",
+                            "source": "mcis-layers",
+                            "source-layer": "fog",
+                            "paint": {
+
+                            },
+                        },
+                        {
+                            "id": "land-labels",
+                            "type": "symbol",
+                            "source": "mcis-layers",
+                            "source-layer": "land",
+                            "paint": {
+                                "text-opacity": 0.3,
+                            },
+                            "layout": {
+                                "text-field": "{label}",
+                                "text-transform": "uppercase",
+                                "text-size": 16,
+                                "text-font": ["Open Sans Bold Italic"],
+                            },
+                        },
+                        {
+                            "id": "biomes-label",
+                            "type": "symbol",
+                            "source": "mcis-layers",
+                            "source-layer": "biomes",
+                            "paint": {
+                                "text-opacity": 0.2
+                            },
+                            "layout": {
+                                "text-field": "{biome}",
+                                "text-size": 14,
+                                "text-transform": "uppercase",
+                            },
+                        },
+                        {
+                            "id": "water-areas-labels",
+                            "type": "symbol",
+                            "source": "mcis-layers",
+                            "source-layer": "water_areas",
+                            "layout": {
+                                "text-field": "{label}",
+                                "text-size": 14,
+                                "text-transform": "uppercase",
+                            },
+                            "paint": {
+                                "text-opacity": 0.5,
+                            },
+                        },
+                        {
+                            "id": "water-paths-labels",
+                            "type": "symbol",
+                            "source": "mcis-layers",
+                            "source-layer": "water_paths",
+                            "layout": {
+                                "text-field": "{label}",
+                                "text-transform": "uppercase",
+                                "symbol-placement": "line",
+                                "text-size": 12,
+                            },
+                            "paint": {
+                                "text-opacity": 0.5,
+                            },
+                        },
+                        {
+                            "id": "roads-labels",
+                            "type": "symbol",
+                            "source": "mcis-layers",
+                            "source-layer": "roads",
+                            "layout": {
+                                "symbol-placement": "line",
+                                "text-transform": "uppercase",
+                                "text-field": "{name}",
+                                "text-size": 10,
+                                "text-font": ["Open Sans Bold"],
+                            },
+                            "paint": {
+                                "text-color": "#fff",
+                                "text-halo-color": "#000",
+                                "text-halo-width": 1,
+                            },
+                        },
+                        {
+                            "id": "poi",
+                            "type": "symbol",
+                            "source": "mcis-layers",
+                            "source-layer": "poi",
+                            "paint": {
+                                "text-color": "#fff",
+                                "text-halo-color": "#000",
+                                "text-halo-width": 2,
+                            },
+                            "layout": {
+                                "icon-image": "circle-stroked-11",
+                                "text-field": "{label}",
+                                "text-font": ["Open Sans Bold"],
+                                "text-size": 12,
+                                "text-offset": [0, 1.5],
+                                "text-transform": "uppercase",
+                            },
+                        },
+                    ]
+                },
+            });
+
+            map.addControl(new mapboxgl.NavigationControl());
+
+            // var Draw = new MapboxDraw();
+            // map.addControl(Draw, 'top-left');
+        </script>
+    </body>
+</html>
