@@ -11,12 +11,13 @@ all: build/tileserver
 build/tileserver: $(OBJS) Makefile
 	mkdir -p build
 	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
-	objcopy --only-keep-debug $@ $@.debug
-	objcopy --strip-debug $@
-	objcopy --add-gnu-debuglink $@.debug $@
+	# objcopy --only-keep-debug $@ $@.debug
+	# objcopy --strip-debug $@
+	# objcopy --add-gnu-debuglink $@.debug $@
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
+.PHONY: clean
 clean:
 	rm -f build/* $(OBJS)

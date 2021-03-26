@@ -1,37 +1,19 @@
 #pragma once
 
 #include <cpp-httplib/httplib.h>
-
-#include <map>
-#include <string>
-
+#include <tileserver/http/common.hpp>
 #include <tileserver/http/config.hpp>
+#include <tileserver/http/service.hpp>
 
 namespace tileserver {
     namespace http {
-        typedef std::map<std::string, std::string> Params;
-
-        enum Method {
-            GET,
-        };
-
-        struct Request {
-            const Params params;
-        };
-
-        struct Response {
-            std::string body;
-        };
-
-        typedef void (*Handler)(const Request&, Response&);
-
         class API {
             const Config &config;
             httplib::Server httpServer;
 
             public:
                 API(const Config &config): config(config) {};
-                void addRoute(const std::string path, const Method method, const Handler handler);
+                void addRoute(const std::string path, const Method method, const Service &service);
                 void start();
         };
     };

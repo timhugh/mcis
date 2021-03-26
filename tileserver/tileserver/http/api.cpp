@@ -6,18 +6,18 @@
 
 using namespace tileserver::http;
 
-Request formatRequest(const httplib::Request &request) {
+const Request formatRequest(const httplib::Request &request) {
     return {};
 };
 
-httplib::Server::Handler wrapHandler(Handler apiHandler) {
-    return [apiHandler](const httplib::Request &httpRequest, httplib::Response &httpResponse) {
+const httplib::Server::Handler wrapService(const Service &service) {
+    return [&service](const httplib::Request &httpRequest, httplib::Response &httpResponse) {
         auto start = std::chrono::high_resolution_clock::now();
 
         const Request apiRequest = formatRequest(httpRequest);
         Response apiResponse;
 
-        apiHandler(apiRequest, apiResponse);
+        service.call(apiRequest, apiResponse);
 
         httpResponse.body = apiResponse.body;
         httpResponse.status = 200;
@@ -31,13 +31,13 @@ httplib::Server::Handler wrapHandler(Handler apiHandler) {
 void API::addRoute(
     const std::string path,
     const Method method,
-    const Handler handler
+    const Service &service
 ) {
-    httplib::Server::Handler wrappedHandler = wrapHandler(handler);
+    const httplib::Server::Handler wrappedService = wrapService(service);
     switch (method)
     {
     case Method::GET:
-        httpServer.Get(path.c_str(), wrappedHandler);
+        httpServer.Get(path.c_str(), wrappedService);
         break;
     }
 };
