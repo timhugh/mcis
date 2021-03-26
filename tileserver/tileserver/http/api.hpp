@@ -16,22 +16,22 @@ namespace tileserver {
         };
 
         struct Request {
-            const tileserver::http::Params params;
+            const Params params;
         };
 
         struct Response {
             std::string body;
         };
 
-        typedef void (*Handler)(const tileserver::http::Request&, tileserver::http::Response&);
+        typedef void (*Handler)(const Request&, Response&);
 
         class API {
-            tileserver::http::Config *config;
+            Config *config;
             httplib::Server httpServer;
 
             public:
                 API(Config* config): config(config) {};
-                void addRoute(const char* path, const tileserver::http::Method method, const tileserver::http::Handler handler);
+                void addRoute(const char* path, const Method method, const Handler handler);
                 void start();
         };
     };

@@ -1,13 +1,20 @@
+#include <spdlog/spdlog.h>
+
 #include <tileserver/http/api.hpp>
 
-using namespace tileserver::http;
+using namespace tileserver;
 
 int main() {
-    Config config = { 3000, "0.0.0.0" };
-    API api(&config);
-    api.addRoute("/", GET, [](const Request &, Response &response) {
+    spdlog::info("Starting tileserver...");
+
+    http::Config config = { 3000, "0.0.0.0" };
+
+    http::API api(&config);
+
+    api.addRoute("/", http::Method::GET, [](const http::Request &, http::Response &response) {
         response.body = "DOES IT WORK?!?";
     });
+
     api.start();
 };
 
