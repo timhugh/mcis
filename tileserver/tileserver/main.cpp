@@ -2,15 +2,25 @@
 #include <spdlog/spdlog.h>
 #include <postgresql/libpq-fe.h>
 
-int main() {
-    const int httpPort = atoi(getenv("HTTP_PORT"));
-    const char* httpAddress = getenv("HTTP_ADDRESS");
+const char* env(const char* name) {
+    const char* value = getenv(name);
+    if (value == NULL || value[0] == '\0') {
+        spdlog::error("Missing value for required environment variable '{}'", name);
+        exit(1);
+    }
+    return value;
+}
 
-    const char* postgresHost = getenv("POSTGRES_HOST");
-    const int postgresPort = atoi(getenv("POSTGRES_PORT"));
-    const char* postgresUser = getenv("POSTGRES_USER");
-    const char* postgresPassword = getenv("POSTGRES_PASSWORD");
-    const char* postgresDatabase = getenv("POSTGRES_DB");
+int main() {
+    spdlog::info("Gathering required configuration...");
+    const int httpPort = atoi(env("HTTP_PORT"));
+    const char* httpAddress = env("HTTP_ADDRESS");
+
+    const char* postgresHost = env("POSTGRES_HOST");
+    const int postgresPort = atoi(env("POSTGRES_PORT"));
+    const char* postgresUser = env("POSTGRES_USER");
+    const char* postgresPassword = env("POSTGRES_PASSWORD");
+    const char* postgresDatabase = env("POSTGRES_DATABASE");
 
     char pgstring[255];
     sprintf(pgstring, "postgresql://%s:%s@%s:%d/%s", postgresUser, postgresPassword, postgresHost, postgresPort, postgresDatabase);

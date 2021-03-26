@@ -14,3 +14,16 @@ services:
       POSTGRES_PASSWORD: "postgres"
     volumes:
       - "postgis-data:/var/lib/postgisql/data"
+
+  tileserver:
+    build: ./tileserver
+    ports:
+      - "3000:3000"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_HOST: "postgis"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DATABASE: "mcis"
+      HTTP_PORT: 3000
+      HTTP_ADDRESS: "0.0.0.0"
