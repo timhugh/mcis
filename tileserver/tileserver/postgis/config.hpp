@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 
-using namespace tileserver;
-
 namespace tileserver {
     namespace postgis {
         struct Config {

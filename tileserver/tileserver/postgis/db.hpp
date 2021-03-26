@@ -6,10 +6,10 @@ namespace tileserver {
     namespace postgis
     {
         class DB {
-            Config config;
+            const Config &config;
 
             public:
-                DB();
-        }
+                DB(const Config &config): config(config) {};
+        };
     };
 };
