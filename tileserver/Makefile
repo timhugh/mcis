@@ -1,25 +1,20 @@
 CC=g++
-CFLAGS=-std=c++17 -Wall -Wextra -pthread -I./libs -I./libs/spdlog/include $(shell pkg-config --cflags libpq)
+CFLAGS=-std=c++17 -Wall -Wextra -pthread -I./libs -I. -I./libs/spdlog/include $(shell pkg-config --cflags libpq)
 LDFLAGS=-L$(shell pg_config --pkglibdir) $(shell pkg-config --libs libpq)
 
-SRC=tileserver/main.cpp
+SRCS=tileserver/main.cpp tileserver/http/api.cpp
+OBJS=$(SRCS:.cpp=.o)
 
-.PHONY: tileserver
-tileserver: build/tileserver
+.PHONY: all
+all: build/tileserver
 
-build/tileserver: $(SRC)
+build/tileserver: $(OBJS) Makefile
 	mkdir -p build
-	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
 
-.PHONY: debug
-debug: build/tileserver-debug
-build/tileserver-debug: $(SRC)
-	mkdir -p build
-	$(CC) $< $(CFLAGS) $(LDFLAGS) -g -o $@
-
-.PHONY: docker
-docker:
-	docker build . -t mcis/tileserver:latest
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f build/*
+	rm -f $(OBJS)
