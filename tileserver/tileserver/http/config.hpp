@@ -4,7 +4,9 @@ namespace tileserver {
     namespace http {
         struct Config {
             const int port;
-            const char* address;
+            const std::string address;
+
+            static const Config fromEnvironment();
         };
     };
 };

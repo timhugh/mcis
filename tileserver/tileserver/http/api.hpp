@@ -26,12 +26,12 @@ namespace tileserver {
         typedef void (*Handler)(const Request&, Response&);
 
         class API {
-            Config *config;
+            Config config;
             httplib::Server httpServer;
 
             public:
-                API(Config* config): config(config) {};
-                void addRoute(const char* path, const Method method, const Handler handler);
+                API(Config config): config(config) {};
+                void addRoute(const std::string path, const Method method, const Handler handler);
                 void start();
         };
     };

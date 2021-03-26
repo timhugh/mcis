@@ -7,9 +7,7 @@ using namespace tileserver;
 int main() {
     spdlog::info("Starting tileserver...");
 
-    http::Config config = { 3000, "0.0.0.0" };
-
-    http::API api(&config);
+    http::API api(http::Config::fromEnvironment());
 
     api.addRoute("/", http::Method::GET, [](const http::Request &, http::Response &response) {
         response.body = "DOES IT WORK?!?";

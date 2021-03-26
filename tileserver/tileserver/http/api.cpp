@@ -29,7 +29,7 @@ httplib::Server::Handler wrapHandler(Handler apiHandler) {
 };
 
 void API::addRoute(
-    const char* path,
+    const std::string path,
     const Method method,
     const Handler handler
 ) {
@@ -37,12 +37,12 @@ void API::addRoute(
     switch (method)
     {
     case Method::GET:
-        httpServer.Get(path, wrappedHandler);
+        httpServer.Get(path.c_str(), wrappedHandler);
         break;
     }
 };
 
 void API::start() {
-    spdlog::info("Starting server on port {}", config->port);
-    httpServer.listen(config->address, config->port);
+    spdlog::info("Starting server on port {}", config.port);
+    httpServer.listen(config.address.c_str(), config.port);
 };
