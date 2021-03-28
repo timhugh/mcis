@@ -2,7 +2,13 @@ CC=g++
 CFLAGS=-std=c++17 -Wall -Wextra -g -pthread -I./libs -I. -I./libs/spdlog/include $(shell pkg-config --cflags libpq)
 LDFLAGS=-L$(shell pg_config --pkglibdir) $(shell pkg-config --libs libpq)
 
-SRCS=tileserver/main.cpp tileserver/env.cpp tileserver/http/api.cpp tileserver/http/config.cpp tileserver/postgis/db.cpp tileserver/postgis/config.cpp
+SRCS=tileserver/main.cpp \
+	 tileserver/env.cpp \
+	 tileserver/http/api.cpp \
+	 tileserver/http/config.cpp \
+	 tileserver/postgis/config.cpp \
+	 tileserver/postgis/db.cpp \
+	 tileserver/tile_service.cpp
 OBJS=$(SRCS:.cpp=.o)
 
 .PHONY: all

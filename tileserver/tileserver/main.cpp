@@ -2,14 +2,15 @@
 
 #include <tileserver/http/api.hpp>
 #include <tileserver/postgis/db.hpp>
+#include <tileserver/tile_service.hpp>
 
 using namespace tileserver;
 
 class POIService : public tileserver::http::Service {
-    postgis::DB &db;
+    const postgis::DB &db;
 
     public:
-        POIService(postgis::DB &db): db(db) {};
+        POIService(const postgis::DB &db): db(db) {};
         void call(const tileserver::http::Request &, tileserver::http::Response &response) const {
             response.body = db.getPOIs();
         };
@@ -20,14 +21,18 @@ int main() {
 
     try {
         const http::Config httpConfig = http::Config::fromEnvironment();
-        http::API api(httpConfig);
         const postgis::Config postgisConfig = postgis::Config::fromEnvironment();
-        postgis::DB db(postgisConfig);
 
+        http::API api(httpConfig);
+        postgis::DB db(postgisConfig);
         POIService poiService(db);
+        TileService tileService(db);
 
         api.addRoute("/", http::Method::GET, poiService);
+        api.addRoute(R"(/(\d+)/(\d+)/(\d+))", http::GET, tileService);
+
         api.start();
+
     } catch(std::string exception) {
         spdlog::critical("Quitting with error: {}",  exception);
     } catch(...) {

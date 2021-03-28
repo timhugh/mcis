@@ -7,7 +7,14 @@
 using namespace tileserver::http;
 
 const Request formatRequest(const httplib::Request &request) {
-    return {};
+    std::vector<std::string> pathParams;
+    for (auto match : request.matches) {
+        pathParams.push_back(match);
+    }
+    return {
+        {},
+        pathParams,
+    };
 };
 
 const httplib::Server::Handler wrapService(const Service &service) {
@@ -20,7 +27,7 @@ const httplib::Server::Handler wrapService(const Service &service) {
         service.call(apiRequest, apiResponse);
 
         httpResponse.body = apiResponse.body;
-        httpResponse.status = 200;
+        httpResponse.status = apiResponse.status;
 
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
