@@ -22,19 +22,19 @@ const Params parseRequestParams(const http::PathParams &params) {
     Params out;
 
     try {
-        out.z = std::stoi(params[0]);
+        out.z = std::stoi(params[1]);
     } catch (std::invalid_argument) {
         out.errors.push_back("Invalid param `z`. Must be a whole number");
     }
 
     try {
-        out.x = std::stof(params[1]);
+        out.x = std::stof(params[2]);
     } catch (std::invalid_argument) {
         out.errors.push_back("Invalid param `x`. Must be a decimal number");
     }
 
     try {
-        out.y = std::stof(params[2]);
+        out.y = std::stof(params[3]);
     } catch (std::invalid_argument) {
         out.errors.push_back("Invalid param `y`. Must be a decimal number");
     }
