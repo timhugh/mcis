@@ -4,10 +4,10 @@
 
 #include <tileserver/http/api.hpp>
 
-using namespace tileserver::http;
+using namespace tileserver;
 
-const Request formatRequest(const httplib::Request &request) {
-    PathParams pathParams;
+const http::Request formatRequest(const httplib::Request &request) {
+    http::PathParams pathParams;
     for (auto match : request.matches) {
         pathParams.push_back(match);
     }
@@ -16,12 +16,12 @@ const Request formatRequest(const httplib::Request &request) {
     };
 };
 
-const httplib::Server::Handler wrapService(const Service &service) {
+const httplib::Server::Handler wrapService(const http::Service &service) {
     return [&service](const httplib::Request &httpRequest, httplib::Response &httpResponse) {
         auto start = std::chrono::high_resolution_clock::now();
 
-        const Request apiRequest = formatRequest(httpRequest);
-        Response apiResponse;
+        const http::Request apiRequest = formatRequest(httpRequest);
+        http::Response apiResponse;
 
         service.call(apiRequest, apiResponse);
 
@@ -34,7 +34,7 @@ const httplib::Server::Handler wrapService(const Service &service) {
     };
 };
 
-void API::addRoute(
+void http::API::addRoute(
     const std::string path,
     const Method method,
     const Service &service
@@ -48,7 +48,7 @@ void API::addRoute(
     }
 };
 
-void API::start() {
+void http::API::start() {
     spdlog::info("Starting server on port {}", config.port);
     httpServer.listen(config.address.c_str(), config.port);
 };
