@@ -28,15 +28,15 @@ const Params parseRequestParams(const http::PathParams &params) {
     }
 
     try {
-        out.x = std::stof(params[2]);
+        out.x = std::stoi(params[2]);
     } catch (std::invalid_argument) {
-        out.errors.push_back("Invalid param `x`. Must be a decimal number");
+        out.errors.push_back("Invalid param `x`. Must be a whole number");
     }
 
     try {
-        out.y = std::stof(params[3]);
+        out.y = std::stoi(params[3]);
     } catch (std::invalid_argument) {
-        out.errors.push_back("Invalid param `y`. Must be a decimal number");
+        out.errors.push_back("Invalid param `y`. Must be a whole number");
     }
 
     return out;
