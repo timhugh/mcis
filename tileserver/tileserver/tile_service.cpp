@@ -73,11 +73,8 @@ const std::string envelopeToBoundsSql(const Envelope &envelope) {
 // Params:
 //  boundsSQL
 //  boundsSQL
-//  geomColumn
 //  attrColumns
 //  table
-//  geomColumn
-//  srid
 const char* TILE_QUERY_FORMAT = R"QUERY(
     WITH
     bounds AS (
@@ -88,7 +85,7 @@ const char* TILE_QUERY_FORMAT = R"QUERY(
         SELECT ST_AsMVTGeom(ST_Transform(t.geom, 3857), bounds.b2d) AS geom,
             %s
         FROM %s t, bounds
-        WHERE ST_Intersects(t.geom, ST_Transform(bounds.geom, %d))
+        WHERE ST_Intersects(t.geom, ST_Transform(bounds.geom, 26918))
     )
     SELECT ST_AsMVT(mvtgeom.*) FROM mvtgeom
 )QUERY";
@@ -96,7 +93,7 @@ const char* TILE_QUERY_FORMAT = R"QUERY(
 const std::string envelopeToSQL(const Envelope &envelope) {
     const std::string bounds = envelopeToBoundsSql(envelope);
     char buf[4096];
-    sprintf(buf, TILE_QUERY_FORMAT, bounds.c_str(), bounds.c_str(), "label", "poi", 26918);
+    sprintf(buf, TILE_QUERY_FORMAT, bounds.c_str(), bounds.c_str(), "label", "land");
     return buf;
 };
 
