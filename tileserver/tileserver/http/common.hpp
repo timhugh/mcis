@@ -6,7 +6,6 @@
 
 namespace tileserver {
     namespace http {
-        typedef std::map<std::string, std::string> Params;
         typedef std::vector<std::string> PathParams;
 
         enum Method {
@@ -14,7 +13,6 @@ namespace tileserver {
         };
 
         struct Request {
-            const Params params;
             const PathParams pathParams;
         };
 

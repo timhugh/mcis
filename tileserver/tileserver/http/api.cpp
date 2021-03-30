@@ -7,12 +7,11 @@
 using namespace tileserver::http;
 
 const Request formatRequest(const httplib::Request &request) {
-    std::vector<std::string> pathParams;
+    PathParams pathParams;
     for (auto match : request.matches) {
         pathParams.push_back(match);
     }
     return {
-        {},
         pathParams,
     };
 };
