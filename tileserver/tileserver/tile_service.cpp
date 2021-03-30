@@ -53,5 +53,4 @@ void TileService::call(const http::Request &request, http::Response &response) c
     }
 
     response.body = "params are valid!";
-    response.status = http::OK;
 };

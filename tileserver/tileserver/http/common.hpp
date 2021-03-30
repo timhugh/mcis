@@ -24,7 +24,7 @@ namespace tileserver {
 
         struct Response {
             std::string body;
-            ResponseStatus status;
+            ResponseStatus status = OK;
         };
 
         typedef std::function<void(const Request&, Response&)> Handler;

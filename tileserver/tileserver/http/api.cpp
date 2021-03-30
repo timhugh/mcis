@@ -30,7 +30,7 @@ const httplib::Server::Handler wrapService(const Service &service) {
 
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        spdlog::info("{} {} - {} ns", httpRequest.method, httpRequest.path, duration.count());
+        spdlog::info("method={} path={} time_elapsed={}ns status={}", httpRequest.method, httpRequest.path, duration.count(), apiResponse.status);
     };
 };
 
