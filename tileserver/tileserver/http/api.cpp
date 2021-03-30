@@ -1,7 +1,5 @@
 #include <chrono>
-
 #include <spdlog/spdlog.h>
-
 #include <tileserver/http/api.hpp>
 
 using namespace tileserver;
@@ -23,10 +21,21 @@ const httplib::Server::Handler wrapService(const http::Service &service) {
         const http::Request apiRequest = formatRequest(httpRequest);
         http::Response apiResponse;
 
-        service.call(apiRequest, apiResponse);
+        try {
+            service.call(apiRequest, apiResponse);
+        } catch (std::string errMsg) {
+            spdlog::error(errMsg);
+            apiResponse.content = errMsg;
+            apiResponse.status = http::ERROR;
+        } catch (std::exception ex) {
+            spdlog::error(ex.what());
+            apiResponse.content = ex.what();
+            apiResponse.status = http::ERROR;
+        }
 
-        httpResponse.body = apiResponse.body;
+        httpResponse.set_content(apiResponse.content, apiResponse.contentType.c_str());
         httpResponse.status = apiResponse.status;
+        httpResponse.set_header("Access-Control-Allow-Origin", "*");
 
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);

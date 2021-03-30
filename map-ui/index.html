@@ -19,7 +19,7 @@
     <body>
         <div id="map"></div>
 
-        <!-- Mapbox GL -->        
+        <!-- Mapbox GL -->
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
 
@@ -41,7 +41,7 @@
                         "mcis-layers": {
                             "type": "vector",
                             "tiles": [
-                                "http://localhost:8000/maps/all_layers/{z}/{x}/{y}",
+                                "http://localhost:3000/{z}/{x}/{y}",
                             ],
                             "minzoom": 6,
                             "maxzoom": 22

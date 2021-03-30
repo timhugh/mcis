@@ -5,25 +5,32 @@ volumes:
 
 services:
   postgis:
-    image: 'postgis/postgis:13-master'
-    restart: 'always'
+    image: postgis/postgis:13-master
+    restart: always
     ports:
-      - "5432:5432"
+      - 5432:5432
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
-      - "postgis-data:/var/lib/postgisql/data"
+      - postgis-data:/var/lib/postgisql/data
+
+  map-ui:
+    image: nginx:latest
+    ports:
+      - 8080:80
+    volumes:
+      - ./map-ui:/usr/share/nginx/html:ro
 
   tileserver:
     build: ./tileserver
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-      POSTGRES_HOST: "postgis"
-      POSTGRES_PORT: "5432"
-      POSTGRES_DATABASE: "mcis"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: postgis
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: mcis
       HTTP_PORT: 3000
-      HTTP_ADDRESS: "0.0.0.0"
+      HTTP_ADDRESS: 0.0.0.0

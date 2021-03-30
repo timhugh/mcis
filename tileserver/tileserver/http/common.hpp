@@ -6,7 +6,7 @@
 
 namespace tileserver {
     namespace http {
-        typedef std::vector<std::string> PathParams;
+        using PathParams = std::vector<std::string>;
 
         enum Method {
             GET,
@@ -23,10 +23,11 @@ namespace tileserver {
         };
 
         struct Response {
-            std::string body;
+            std::string content;
+            std::string contentType = "text/plain";
             ResponseStatus status = OK;
         };
 
-        typedef std::function<void(const Request&, Response&)> Handler;
+        using Handler = std::function<void(const Request&, Response&)>;
     };
 };

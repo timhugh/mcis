@@ -1,12 +1,12 @@
 #include <tileserver/postgis/db.hpp>
 
-using namespace tileserver::postgis;
+using namespace tileserver;
 
-std::string connectionString(const Config &config) {
+std::string connectionString(const postgis::Config &config) {
     return "postgres://" + config.user + ":" + config.password + "@" + config.host + ":" + std::to_string(config.port) + "/" + config.database;
 };
 
-tileserver::postgis::DB::DB(const Config &config): config(config) {
+postgis::DB::DB(const postgis::Config &config): config(config) {
     const std::string connString = connectionString(config);
     conn = PQconnectdb(connString.c_str());
 
@@ -16,11 +16,11 @@ tileserver::postgis::DB::DB(const Config &config): config(config) {
     }
 };
 
-tileserver::postgis::DB::~DB() {
+postgis::DB::~DB() {
     PQfinish(conn);
 };
 
-const std::string tileserver::postgis::DB::getPOIs() const {
+const std::string postgis::DB::getPOIs() const {
     PGresult *res = PQexec(conn, "SELECT * FROM poi");
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         std::string msg = "Failed to read POIs from DB: " + std::string(PQerrorMessage(conn));
@@ -46,4 +46,15 @@ const std::string tileserver::postgis::DB::getPOIs() const {
     }
 
     return response;
-}
+};
+
+const std::string postgis::DB::executeRawSql(const std::string query) const {
+    PGresult *res = PQexec(conn, query.c_str());
+    if(PQresultStatus(res) != PGRES_TUPLES_OK) {
+        std::string errorMsg = "Failed to fetch vector tiles: " + std::string(PQerrorMessage(conn));
+        PQclear(res);
+        throw errorMsg;
+    }
+
+    return PQgetvalue(res, 0, 0);
+};

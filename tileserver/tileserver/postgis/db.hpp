@@ -15,7 +15,9 @@ namespace tileserver {
                 DB(const Config &config);
                 ~DB();
 
+                // TODO: these are all just for debugging/iterating and should go away later
                 const std::string getPOIs() const;
+                const std::string executeRawSql(const std::string query) const;
         };
     };
 };

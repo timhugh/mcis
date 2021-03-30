@@ -12,11 +12,14 @@ class POIService : public tileserver::http::Service {
     public:
         POIService(const postgis::DB &db): db(db) {};
         void call(const tileserver::http::Request &, tileserver::http::Response &response) const {
-            response.body = db.getPOIs();
+            response.content = db.getPOIs();
         };
 };
 
 int main() {
+    // TODO: set by environment
+    spdlog::set_level(spdlog::level::debug);
+
     spdlog::info("Starting tileserver...");
 
     try {
