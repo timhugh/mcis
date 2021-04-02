@@ -71,29 +71,30 @@ const std::string envelopeToBoundsSql(const Envelope &envelope) {
 };
 
 // Params:
-//  boundsSQL
-//  boundsSQL
-//  attrColumns
-//  table
+// layer label
+// attribute column(s)
+// envelope sql
+// table name
 const char* TILE_QUERY_FORMAT = R"QUERY(
-    WITH
-    bounds AS (
-        SELECT %s AS geom,
-        %s::box2d as b2d
-    ),
-    mvtgeom AS (
-        SELECT ST_AsMVTGeom(ST_Transform(t.geom, 3857), bounds.b2d) AS geom,
-            %s
-        FROM %s t, bounds
-        WHERE ST_Intersects(t.geom, ST_Transform(bounds.geom, 26918))
-    )
-    SELECT ST_AsMVT(mvtgeom.*) FROM mvtgeom
+    SELECT ST_AsMVT(q, '%s')
+    FROM (
+        SELECT
+            %s,
+            ST_AsMVTGeom(
+                geom,
+                %s,
+                4096,
+                256,
+                false
+            ) geom
+        FROM %s
+    ) q;
 )QUERY";
 
 const std::string envelopeToSQL(const Envelope &envelope) {
     const std::string bounds = envelopeToBoundsSql(envelope);
     char buf[4096];
-    sprintf(buf, TILE_QUERY_FORMAT, bounds.c_str(), bounds.c_str(), "label", "land");
+    sprintf(buf, TILE_QUERY_FORMAT, "land", "gid, label", bounds.c_str(), "land");
     return buf;
 };
 
@@ -114,6 +115,12 @@ void TileService::call(const http::Request &request, http::Response &response) c
     std::string pbfQuery = envelopeToSQL(envelope);
     spdlog::debug("generated query: {}", pbfQuery);
 
-    response.content = db.executeRawSql(pbfQuery);
-    response.contentType = "application/vnd.mapbox-vector-tile";
+    try{
+        response.content = db.executeRawSql(pbfQuery);
+        response.contentType = "application/x-protobuf";
+    } catch (std::string error) {
+        response.content = "Failed to fetch vector tiles: " + error;
+        response.contentType = "text/plain";
+        response.status = http::ERROR;
+    }
 };

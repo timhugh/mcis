@@ -4,7 +4,7 @@ WORKDIR /app
 RUN apt update && apt install -y \
     libpq-dev
 COPY . .
-RUN make
+RUN make -j
 
 FROM ubuntu:latest
 WORKDIR /app

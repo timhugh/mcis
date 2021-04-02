@@ -32,7 +32,7 @@ int main() {
         TileService tileService(db);
 
         api.addRoute("/", http::Method::GET, poiService);
-        api.addRoute(R"(/(\d+)/(\d+)/(\d+))", http::GET, tileService);
+        api.addRoute(R"(/(\d+)/(\d+)/(\d+).vector.pbf)", http::GET, tileService);
 
         api.start();
 

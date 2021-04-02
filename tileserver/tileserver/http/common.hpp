@@ -7,6 +7,7 @@
 namespace tileserver {
     namespace http {
         using PathParams = std::vector<std::string>;
+        using Headers = std::map<std::string, std::string>;
 
         enum Method {
             GET,
@@ -25,6 +26,7 @@ namespace tileserver {
         struct Response {
             std::string content;
             std::string contentType = "text/plain";
+            Headers headers;
             ResponseStatus status = OK;
         };
 

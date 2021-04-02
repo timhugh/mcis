@@ -61,9 +61,10 @@ const std::string postgis::DB::getPOIs() const {
 const std::string postgis::DB::executeRawSql(const std::string query) const {
     PGresult *res;
     withConnection([&res, query](PGconn *conn) {
-        res = PQexec(conn, query.c_str());
+        res = PQexecParams(conn, query.c_str(), 0, {}, {}, {}, {}, 1);
+        // res = PQexec(conn, query.c_str());
         if(PQresultStatus(res) != PGRES_TUPLES_OK) {
-            std::string errorMsg = "Failed to fetch vector tiles: " + std::string(PQerrorMessage(conn));
+            std::string errorMsg = "Failed to execute sql: " + std::string(PQerrorMessage(conn));
             PQclear(res);
             throw errorMsg;
         }

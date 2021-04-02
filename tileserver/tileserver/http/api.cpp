@@ -29,11 +29,15 @@ const httplib::Server::Handler wrapService(const http::Service &service) {
             apiResponse.status = http::ERROR;
         } catch (std::exception ex) {
             spdlog::error(ex.what());
-            apiResponse.content = ex.what();
+            apiResponse.content = apiResponse.content;
             apiResponse.status = http::ERROR;
         }
 
-        httpResponse.set_content(apiResponse.content, apiResponse.contentType.c_str());
+        for (std::pair<std::string, std::string> header : apiResponse.headers) {
+            httpResponse.set_header(header.first.c_str(), header.second);
+        }
+
+        httpResponse.set_content(apiResponse.content.c_str(), apiResponse.contentType.c_str());
         httpResponse.status = apiResponse.status;
         httpResponse.set_header("Access-Control-Allow-Origin", "*");
 
