@@ -41,42 +41,30 @@ database.connect().then(() => {
 const Router = require('koa-router');
 const router = new Router();
 
-router.get('/:z/:x/:y', async ctx => {
-    // World constants for EPSG:3857
-    const worldMercMax = 20037508.3427892;
-    const worldMercMin = worldMercMax * -1;
-    const worldMercSize = worldMercMax - worldMercMin;
-
+router.get('/:z/:x/:y.vector.pbf', async ctx => {
     const {x, y, z} = ctx.params;
     Logger.info(`fetching tile at x:${x} y:${y} z:${z}`);
 
-    const tileSize = Math.pow(2, z);
-    Logger.info(`tilesize: ${tileSize}`);
-
-    const tileMercSize = worldMercSize / tileSize;
-    Logger.info(`projected tilesize: ${tileMercSize}`);
-
-    xmin = worldMercMin + (tileMercSize * x);
-    xmax = worldMercMin + (tileMercSize * (x + 1));
-    ymin = worldMercMax - (tileMercSize * (y + 1));
-    ymax = worldMercMax - (tileMercSize * y);
-
-    const query =  `SELECT ST_AsMVT(q, 'poi') as tiles
-                    FROM (
-                        SELECT
-                            gid, label,
-                            ST_AsMVTGeom(
-                                geom,
-                                ST_Segmentize(ST_MakeEnvelope(${xmin}, ${ymin}, ${xmax}, ${ymax}, 3857), 2.388657),
-                                4096,
-                                256,
-                                false
-                            ) geom
-                        FROM poi
-                    ) q;`;
+    const tileExtent = 4096;
+    const tileBuffer = 64;
+    const table = 'land';
+    const query = `
+        SELECT ST_AsMVT(q, '${table}') as tile
+        FROM (
+            SELECT
+                gid, label,
+                ST_AsMVTGeom(
+                    geom,
+                    ST_TileEnvelope(${z}, ${x}, ${y}),
+                    extent => ${tileExtent},
+                    buffer => ${tileBuffer}
+                ) geom
+            FROM ${table}
+        ) q;
+    `;
     Logger.info(`executing query: ${query}`);
-    const result = await database.query(query);
-    ctx.body = result.rows[0].tiles;
+    const result = await database.query(query).then(res => res.rows[0].tile);
+    ctx.body = result;
     ctx.header['content-type'] = 'application/x-protobuf';
     ctx.status = 200;
 });
