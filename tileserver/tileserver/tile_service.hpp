@@ -12,5 +12,6 @@ namespace tileserver {
         public:
             TileService(const tileserver::postgis::DB &db);
             void call(const http::Request &, http::Response &response) const;
+            const std::string generateTile(const int x, const int y, const int z) const;
     };
 };

@@ -70,5 +70,5 @@ const std::string postgis::DB::executeRawSql(const std::string query) const {
         }
     });
 
-    return PQgetvalue(res, 0, 0);
+    return std::string(PQgetvalue(res, 0, 0));
 };

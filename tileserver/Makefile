@@ -21,6 +21,12 @@ build/tileserver: $(OBJS) Makefile
 	# objcopy --strip-debug $@
 	# objcopy --add-gnu-debuglink $@.debug $@
 
+.PHONY: demo
+demo: build/demo
+build/demo: tileserver/demo.cpp Makefile
+	mkdir -p build
+	$(CC) tileserver/demo.cpp $(CFLAGS) $(LDFLAGS) -o $@
+
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 

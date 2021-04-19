@@ -7,7 +7,7 @@ all: tileserver
 
 .PHONY: tileserver
 tileserver:
-	$(MAKE) -C tileserver
+	$(MAKE) -j -C tileserver
 
 .PHONY: backup
 backup:

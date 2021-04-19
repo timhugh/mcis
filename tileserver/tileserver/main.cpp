@@ -1,5 +1,4 @@
 #include <spdlog/spdlog.h>
-
 #include <tileserver/http/api.hpp>
 #include <tileserver/postgis/db.hpp>
 #include <tileserver/tile_service.hpp>
@@ -37,7 +36,7 @@ int main() {
         api.start();
 
     } catch(std::string exception) {
-        spdlog::critical("Quitting with error: {}",  exception);
+        spdlog::critical("Quitting with error: {}", exception);
     } catch(...) {
         spdlog::critical("Quitting with unknown error");
     }
