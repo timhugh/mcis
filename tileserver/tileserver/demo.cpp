@@ -3,6 +3,7 @@
 #include <chrono>
 #include <exception>
 #include <string>
+#include <string.h>
 #include <postgresql/libpq-fe.h>
 
 // Params:
@@ -65,8 +66,17 @@ int main() {
                     throw err;
                 }
 
+                const int resultLength = PQgetlength(res, 0, 0);
                 const char* tile = PQgetvalue(res, 0, 0);
-                response.set_content(tile, "application/x-protobuf");
+                response.set_content_provider(
+                    resultLength,
+                    "application/x-protobuf",
+                    [tile](size_t offset, size_t length, httplib::DataSink &sink) {
+                        const char* t = tile;
+                        sink.write(&t[offset], std::min(length, size_t(4)));
+                        return true;
+                    }
+                );
                 httpStatus = 200;
             } catch(std::string exception) {
                 spdlog::error(exception);
