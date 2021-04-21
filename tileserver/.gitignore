@@ -1,4 +1,0 @@
-build/*
-*.o
-libs/*
-^libs/Makefile
