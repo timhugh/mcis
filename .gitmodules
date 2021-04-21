@@ -1,6 +1,0 @@
-[submodule "tileserver/libs/spdlog"]
-	path = tileserver/libs/spdlog
-	url = git@github.com:gabime/spdlog.git
-[submodule "tileserver/libs/cpp-httplib"]
-	path = tileserver/libs/cpp-httplib
-	url = git@github.com:yhirose/cpp-httplib.git
