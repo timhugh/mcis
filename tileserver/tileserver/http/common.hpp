@@ -13,6 +13,11 @@ namespace tileserver {
             GET,
         };
 
+        enum ContentType {
+            PLAIN_TEXT,
+            PROTOBUF,
+        };
+
         struct Request {
             const PathParams pathParams;
         };
@@ -25,7 +30,8 @@ namespace tileserver {
 
         struct Response {
             std::string content;
-            std::string contentType = "text/plain";
+            int contentLength = 0;
+            ContentType contentType = PLAIN_TEXT;
             Headers headers;
             ResponseStatus status = OK;
         };

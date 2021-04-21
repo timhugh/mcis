@@ -58,7 +58,7 @@ const std::string postgis::DB::getPOIs() const {
     return response;
 };
 
-const std::string postgis::DB::executeRawSql(const std::string query) const {
+const std::vector<char> postgis::DB::binaryQuery(const std::string query) const {
     PGresult *res;
     withConnection([&res, query](PGconn *conn) {
         res = PQexecParams(conn, query.c_str(), 0, {}, {}, {}, {}, 1);
@@ -70,5 +70,8 @@ const std::string postgis::DB::executeRawSql(const std::string query) const {
         }
     });
 
-    return std::string(PQgetvalue(res, 0, 0));
+    const int resultLength = PQgetlength(res, 0, 0);
+    const char* result = PQgetvalue(res, 0, 0);
+    const std::vector<char> out(result, result + resultLength);
+    return out;
 };

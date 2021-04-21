@@ -2,6 +2,7 @@
 
 #include <tileserver/http/service.hpp>
 #include <tileserver/postgis/db.hpp>
+#include <vector>
 
 using namespace tileserver;
 
@@ -12,6 +13,6 @@ namespace tileserver {
         public:
             TileService(const tileserver::postgis::DB &db);
             void call(const http::Request &, http::Response &response) const;
-            const std::string generateTile(const int x, const int y, const int z) const;
+            const std::vector<char> generateTile(const int x, const int y, const int z) const;
     };
 };

@@ -37,8 +37,24 @@ const httplib::Server::Handler wrapService(const http::Service &service) {
             httpResponse.set_header(header.first.c_str(), header.second);
         }
 
-        httpResponse.set_content(apiResponse.content.c_str(), apiResponse.contentType.c_str());
-        httpResponse.status = apiResponse.status;
+        if (apiResponse.contentType == http::PROTOBUF) {
+            if(apiResponse.contentLength == 0) {
+                httpResponse.status = 204;
+            } else {
+                httpResponse.status = 200;
+                httpResponse.set_content_provider(
+                    apiResponse.contentLength,
+                    "application/x-protobuf",
+                    [&apiResponse](size_t offset, size_t length, httplib::DataSink &sink) {
+                        sink.write(apiResponse.content.substr(offset, length).c_str(), length);
+                        return true;
+                    }
+                );
+            }
+        } else {
+            httpResponse.set_content(apiResponse.content.c_str(), "text/plain");
+            httpResponse.status = apiResponse.status;
+        }
         httpResponse.set_header("Access-Control-Allow-Origin", "*");
 
         auto stop = std::chrono::high_resolution_clock::now();

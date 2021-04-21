@@ -2,7 +2,9 @@
 
 #include <functional>
 #include <postgresql/libpq-fe.h>
+#include <string>
 #include <tileserver/postgis/config.hpp>
+#include <vector>
 
 namespace tileserver {
     namespace postgis
@@ -15,7 +17,7 @@ namespace tileserver {
 
                 // TODO: these are all just for debugging/iterating and should go away later
                 const std::string getPOIs() const;
-                const std::string executeRawSql(const std::string query) const;
+                const std::vector<char> binaryQuery(const std::string query) const;
 
             private:
                 PGconn* createConnection() const;

@@ -10,20 +10,20 @@ using namespace tileserver;
 
 TileService::TileService(const postgis::DB &db): db(db) {};
 
-struct Tile {
+struct TileParams {
     const int z, x, y;
 };
 
-const std::string validateTile(const Tile &tile) {
-    if (tile.z < 0 || tile.z > 24) {
+const std::string validateTile(const TileParams &params) {
+    if (params.z < 0 || params.z > 24) {
         return "Zoom level must be between 0 and 24";
     }
-    const int maxSize = pow(2, tile.z);
+    const int maxSize = pow(2, params.z);
     if (
-        tile.x < 0 || tile.x > maxSize ||
-        tile.y < 0 || tile.y > maxSize
+        params.x < 0 || params.x > maxSize ||
+        params.y < 0 || params.y > maxSize
     ) {
-        return "X and Y must be between 0 and " + std::to_string(maxSize) + " for zoom level " + std::to_string(tile.z);
+        return "X and Y must be between 0 and " + std::to_string(maxSize) + " for zoom level " + std::to_string(params.z);
     }
 
     return "";
@@ -51,24 +51,24 @@ const char* TILE_QUERY_FORMAT = R"QUERY(
     ) q;
 )QUERY";
 
-const std::string tileToSql(const Tile &tile) {
+const std::string tileToSql(const TileParams &params) {
     char buf[4096];
-    sprintf(buf, TILE_QUERY_FORMAT, "land", "gid, label", tile.z, tile.x, tile.y, "land");
+    sprintf(buf, TILE_QUERY_FORMAT, "land", "gid, label", params.z, params.x, params.y, "land");
     return buf;
 };
 
-const std::string TileService::generateTile(const int x, const int y, const int z) const {
-    const Tile tile = { z, x, y };
-    const std::string validationError = validateTile(tile);
+const std::vector<char> TileService::generateTile(const int x, const int y, const int z) const {
+    const TileParams params = { z, x, y };
+    const std::string validationError = validateTile(params);
     if(!validationError.empty()) {
         throw validationError;
     }
-    spdlog::debug("valid tile with x:{} y:{} z:{}", tile.x, tile.y, tile.z);
+    spdlog::debug("valid tile with x:{} y:{} z:{}", params.x, params.y, params.z);
 
-    std::string pbfQuery = tileToSql(tile);
+    std::string pbfQuery = tileToSql(params);
     spdlog::debug("generated query: {}", pbfQuery);
 
-    return db.executeRawSql(pbfQuery);
+    return db.binaryQuery(pbfQuery);
 };
 
 void TileService::call(const http::Request &request, http::Response &response) const {
@@ -77,12 +77,14 @@ void TileService::call(const http::Request &request, http::Response &response) c
     const int y = std::stoi(request.pathParams[3]);
 
     try{
-        const std::string tile = generateTile(x, y, z);
-        response.content = tile;
-        response.contentType = "application/x-protobuf";
+        const std::vector<char> tile = generateTile(x, y, z);
+        const std::string content(tile.begin(), tile.end());
+        response.content = content;
+        response.contentLength = tile.size();
+        response.contentType = http::PROTOBUF;
     } catch (std::string error) {
         response.content = "Failed to fetch vector tiles: " + error;
-        response.contentType = "text/plain";
+        response.contentType = http::PLAIN_TEXT;
         response.status = http::ERROR;
     }
 };
