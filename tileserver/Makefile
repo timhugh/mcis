@@ -14,22 +14,20 @@ OBJS=$(SRCS:.cpp=.o)
 .PHONY: all
 all: build/tileserver
 
-build/tileserver: $(OBJS) Makefile
+build/tileserver: dependencies $(OBJS) Makefile
 	mkdir -p build
 	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
 	# objcopy --only-keep-debug $@ $@.debug
 	# objcopy --strip-debug $@
 	# objcopy --add-gnu-debuglink $@.debug $@
 
-.PHONY: demo
-demo: build/demo
-build/demo: tileserver/demo.cpp Makefile
-	mkdir -p build
-	$(CC) tileserver/demo.cpp $(CFLAGS) $(LDFLAGS) -o $@
-
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
+.PHONY: dependencies
+dependencies:
+	$(MAKE) -j -C ./libs/ all
+
 .PHONY: clean
 clean:
-	rm -f build/* $(OBJS)
+	rm -rf build/* $(OBJS) libs/spdlog* libs/cpp-httplib*
